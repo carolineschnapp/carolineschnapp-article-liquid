@@ -1,75 +1,74 @@
-<!-- BEGIN #generated-article-liquid -->
-<div id="generated-article-liquid">
-
+{% paginate article.comments by 100 %}
+<!-- BEGIN #article-wrapper -->
+<div id="article-wrapper">
   <!-- BEGIN .article -->
   <div class="article">
-    <h2 class="article-title title"><a href="{{ article.url }}">{{ article.title }}</a></h2>    
-    <h4 class="article-details posted">Posted by {{ article.author }} on {{ article.created_at | date: "%B %d, %Y" }}</h4>
+    <h2 class="article-title title">{{ article.title }}</h2>
+    <h4 class="article-details posted byline">
+      Posted
+      <span class="date">on {{ article.published_at | date: "%B %d, %Y" }}</span>
+      <span class="author">by {{ article.author }}</span>
+    </h4>
     <div class="article-body entry">
       {{ article.content }}
     </div>
-    {% if blog.comments_enabled? %}{% if article.comments.size or comment %}
-    <h6 class="comments-info">
-      <a href="#comments">{% if comment and comment.created_at %}
-        {{ article.comments_count | plus: 1 }} {{ article.comments_count | plus: 1 | pluralize: "Comment", "Comments" }}{% else %}
-        {{ article.comments_count }} {{ article.comments_count | pluralize: "Comment", "Comments" }}{% endif %}
-      </a>
-    </h6>{% endif %}{% endif %}
   </div>
-  <!-- END .article -->
-
-  {% if blog.comments_enabled? %}
-  
+  <!-- END .article -->{% if blog.comments_enabled? %}
   <!-- BEGIN #comments -->
-  <div id="comments">
-    
-    <h3>Comments</h3>
-    
-    {% if article.comments.size == 0 and comment == nil %}
-    <p id="empty">There are no comments.</p>
-    
-    {% elsif article.comments.size > 0 or comment %}
-    <!-- BEGIN #comment-list  -->
+  <div id="comments">{% if comment and comment.created_at %}
+    {% assign a_comment_was_just_published_succesfully = true %}
+    <h4 class="comments-info">
+        {{ article.comments_count | plus: 1 }} {{ article.comments_count | plus: 1 | pluralize: "Comment", "Comments" }}
+    </h4>{% elsif article.comments_count > 0 %}
+    <h4 class="comments-info">
+        {{ article.comments_count }} {{ article.comments_count | pluralize: "Comment", "Comments" }}
+    </h4>{% else %}
+    <p id="empty" class="hint">There are no comments.</p>{% endif %}{% if article.comments_count > 0 or comment.created_at %}
+    <!-- BEGIN #comment-list -->
     <ul id="comment-list">{% for comment in article.comments %}
-      <li id="comment-{{ comment.id }}" class="comment{% if forloop.last and comment == nil %} end{% endif %}">
-        <div class="comment-body">
-          {{ comment.content }}
-        </div>
+      <li id="comment-{{ comment.id }}" class="comment {{ comment.status }} {% if forloop.last %}{% unless a_comment_was_just_published_succesfully %} end last{% endunless %}{% endif %}">
         <h6 class="author comment-details">
-          Posted by {{ comment.author }} on {{ comment.created_at | date: "%B %d, %Y" }}
+          <span class="author">{{ comment.author }}</span>
+          <span class="says">said</span>
+          <span class="date">on {{ comment.created_at | date: "%m/%d at %I:%M %p" }}</span>
         </h6>
-      </li>
-      {% endfor %}{% if comment and comment.created_at %}
-      <li class="comment-{{ comment.id }} not-yet-published end">
         <div class="comment-body">
           {{ comment.content }}
         </div>
+      </li>{% endfor %}{% if comment and comment.created_at %}
+      <li id="comment-{{ comment.id }}" class="{{ comment.status }} not-yet-published end last">
         <h6 class="author comment-details">
-          Posted by {{ comment.author }} on {{ comment.created_at | date: "%B %d, %Y" }}
-          </h6>
+          <span class="author">{{ comment.author }}</span>
+          <span class="says">said</span>
+          <span class="date">on {{ comment.created_at | date: "%m/%d at %I:%M %p" }}</span>
+        </h6>
+        <div class="comment-body">
+          {{ comment.content }}
+        </div>
       </li>{% endif %}
     </ul>
-    <!-- END #comment-list -->
-    {% endif %}
-
+    <!-- END #comment-list -->{% endif %}{% if paginate.pages > 1 %}
+    <div id="paginate">
+      {{ paginate | default_pagination }}
+    </div>{% endif %}
     <!-- BEGIN #comment-form -->
     <div id="comment-form">
-      <h3>Post Comment</h3>
+      <h3>Leave a Comment</h3>
       <!-- START COMMENT FORM -->
       {% form article %}{% if form.posted_successfully? %}{% if blog.moderated? %}
         <p id="posted">Successfully posted and awaiting approval by moderator.</p>{% else %}
         <p id="posted">Successfully posted your comment.</p>{% endif %}{% elsif form.errors %}
         <p id="error">The {{ form.errors.size | pluralize: 'field', 'fields' }} {{ form.errors | join: ' and ' }} {{ form.errors.size | pluralize: 'has', 'have' }} not been filled out correctly!</p>{% endif %}
         <div class="comment-form-field{% if form.errors contains 'author' %} error{% endif %}">
-          <label for="comment_author"{% if form.errors contains 'author' %} class="error"{% endif %}>Name</label>
+          <label for="comment_author"{% if form.errors contains 'author' %} class="error"{% endif %}>Your Name</label>
           <input type="text" id="comment_author" name="comment[author]" value="{{ form.author }}" class="field{% if form.errors contains 'author' %} error{% endif %}" />
         </div>
         <div class="comment-form-field{% if form.errors contains 'email' %} error{% endif %}">
-          <label for="comment_email"{% if form.errors contains 'email' %} class="error"{% endif %}>Email Address <small>(we never show this)</small></label>
+          <label for="comment_email"{% if form.errors contains 'email' %} class="error"{% endif %}>Your Email <small>(we never show this)</small></label>
           <input type="text" id="comment_email" name="comment[email]" value="{{ form.email }}" class="field{% if form.errors contains 'email' %} error{% endif %}" />
         </div>
         <div class="comment-form-field{% if form.errors contains 'body' %} error{% endif %}">
-          <label for="comment_body"{% if form.errors contains 'body' %} class="error"{% endif %}>Comment</label>
+          <label for="comment_body"{% if form.errors contains 'body' %} class="error"{% endif %}>Your Comment <small>(you can use <a href="http://redcloth.org/hobix.com/textile/" title="A Textile Reference">Textile</a>)</small></label>
           <textarea id="comment_body" name="comment[body]" cols="" rows=""{% if form.errors contains 'body' %} class="error"{% endif %}>{{ form.body }}</textarea>
         </div>
         <p>
@@ -78,10 +77,18 @@
       {% endform %}
       <!-- END COMMENT FORM -->
     </div>
-    <!-- END #comment-form -->
+    <!-- END #comment-form -->{% if blog.moderated? %}
+    <p class="hint">Comments have to be approved before they're published.</p>{% endif %}
   </div>
-  <!-- END #comments -->
-  {% endif %}
-
+  <!-- END #comments -->{% endif %}
 </div>
-<!-- END #generated-article-liquid -->
+<!-- END #article-wrapper -->{% if blog.previous_article or blog.next_article %}
+<div class="paginate" style="overflow:hidden">{% if blog.previous_article %}
+  <div style="float:left">
+    {{ '&larr; previous post' | link_to: blog.previous_article }}
+  </div>{% endif %}{% if blog.next_article %}
+  <div style="float:right">
+    {{ 'next post &rarr;' | link_to: blog.next_article }}
+  </div>{% endif %}
+</div>{% endif %}
+{% endpaginate %}
