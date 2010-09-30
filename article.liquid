@@ -4,11 +4,11 @@
   <!-- BEGIN .article -->
   <div class="article">
     <h2 class="article-title title">{{ article.title }}</h2>
-    <h4 class="article-details posted byline">
+    <h3 class="article-details posted byline">
       Posted
       <span class="date">on {{ article.published_at | date: "%B %d, %Y" }}</span>
       <span class="author">by {{ article.author }}</span>
-    </h4>
+    </h3>
     <div class="article-body entry">
       {{ article.content }}
     </div>
