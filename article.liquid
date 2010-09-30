@@ -15,8 +15,7 @@
   </div>
   <!-- END .article -->{% if blog.comments_enabled? %}
   <!-- BEGIN #comments -->
-  <div id="comments">{% if comment and comment.created_at %}
-    {% assign a_comment_was_just_published_succesfully = true %}
+  <div id="comments">{% if comment and comment.created_at %}{% assign a_comment_was_just_published_successfully = true %}
     <h4 class="comments-info">
         {{ article.comments_count | plus: 1 }} {{ article.comments_count | plus: 1 | pluralize: "Comment", "Comments" }}
     </h4>{% elsif article.comments_count > 0 %}
@@ -26,22 +25,22 @@
     <p id="empty" class="hint">There are no comments.</p>{% endif %}{% if article.comments_count > 0 or comment.created_at %}
     <!-- BEGIN #comment-list -->
     <ul id="comment-list">{% for comment in article.comments %}
-      <li id="comment-{{ comment.id }}" class="comment {{ comment.status }} {% if forloop.last %}{% unless a_comment_was_just_published_succesfully %} end last{% endunless %}{% endif %}">
-        <h6 class="author comment-details">
+      <li id="comment-{{ comment.id }}" class="comment {{ comment.status }} {% if forloop.last %}{% unless a_comment_was_just_published_successfully %} end last{% endunless %}{% endif %}">
+        <h5 class="comment-details">
           <span class="author">{{ comment.author }}</span>
           <span class="says">said</span>
           <span class="date">on {{ comment.created_at | date: "%m/%d at %I:%M %p" }}</span>
-        </h6>
+        </h5>
         <div class="comment-body">
           {{ comment.content }}
         </div>
       </li>{% endfor %}{% if comment and comment.created_at %}
-      <li id="comment-{{ comment.id }}" class="{{ comment.status }} not-yet-published end last">
-        <h6 class="author comment-details">
+      <li id="comment-{{ comment.id }}" class="{{ comment.status }} not-yet-published last">
+        <h5 class="comment-details">
           <span class="author">{{ comment.author }}</span>
           <span class="says">said</span>
           <span class="date">on {{ comment.created_at | date: "%m/%d at %I:%M %p" }}</span>
-        </h6>
+        </h5>
         <div class="comment-body">
           {{ comment.content }}
         </div>
@@ -56,9 +55,9 @@
       <h3>Leave a Comment</h3>
       <!-- START COMMENT FORM -->
       {% form article %}{% if form.posted_successfully? %}{% if blog.moderated? %}
-        <p id="posted">Successfully posted and awaiting approval by moderator.</p>{% else %}
-        <p id="posted">Successfully posted your comment.</p>{% endif %}{% elsif form.errors %}
-        <p id="error">The {{ form.errors.size | pluralize: 'field', 'fields' }} {{ form.errors | join: ' and ' }} {{ form.errors.size | pluralize: 'has', 'have' }} not been filled out correctly!</p>{% endif %}
+        <p class="feedback notice">Successfully posted and awaiting approval by moderator.</p>{% else %}
+        <p class="feedback notice">Successfully posted your comment.</p>{% endif %}{% elsif form.errors %}
+        <p class="feedback error">The {{ form.errors.size | pluralize: 'field', 'fields' }} {{ form.errors | join: ' and ' }} {{ form.errors.size | pluralize: 'has', 'have' }} not been filled out correctly!</p>{% endif %}
         <div class="comment-form-field{% if form.errors contains 'author' %} error{% endif %}">
           <label for="comment_author"{% if form.errors contains 'author' %} class="error"{% endif %}>Your Name</label>
           <input type="text" id="comment_author" name="comment[author]" value="{{ form.author }}" class="field{% if form.errors contains 'author' %} error{% endif %}" />
